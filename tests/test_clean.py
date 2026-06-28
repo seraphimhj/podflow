@@ -21,3 +21,23 @@ This is a test
     assert "WEBVTT" not in out
     assert out.count("Hello world") == 1
     assert "This is a test" in out
+
+
+def test_clean_handles_youtube_auto_captions():
+    raw = """WEBVTT
+Kind: captions
+Language: en
+
+00:00:00.000 --> 00:00:02.159 align:start position:0%
+old<00:00:00.480><c> media,</c><00:00:01.120><c> you</c>
+
+00:00:02.159 --> 00:00:02.169 align:start position:0%
+old media, you
+had restricted channels
+"""
+    out = clean_transcript(raw)
+    assert "<c>" not in out and "<00:" not in out  # inline tags stripped
+    assert "Kind:" not in out and "Language:" not in out  # header stripped
+    assert "align:start" not in out  # timing line stripped
+    assert out.count("old media, you") == 1  # rolling dupe collapsed
+    assert "had restricted channels" in out

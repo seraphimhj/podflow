@@ -5,6 +5,8 @@ import urllib.request
 
 _TS = re.compile(r"\d{1,2}:\d{2}:\d{2}[.,]\d{3}\s*-->.*")
 _CUE = re.compile(r"^\d+$")
+_TAG = re.compile(r"<[^>]*>")  # YouTube inline word-timing tags: <00:00:00.480><c>
+_HEADER = re.compile(r"^(Kind|Language):", re.IGNORECASE)  # YouTube auto-caption header
 
 
 def _pick_audio(filenames: list[str]) -> str:
@@ -19,11 +21,12 @@ def _pick_audio(filenames: list[str]) -> str:
 
 
 def clean_transcript(raw: str) -> str:
-    """Strip VTT/SRT timestamps, cue numbers, blank runs, consecutive dupes."""
+    """Strip VTT/SRT timestamps, cue numbers, YouTube inline tags/headers,
+    blank runs, consecutive dupes."""
     lines = []
     for line in raw.splitlines():
-        s = line.strip()
-        if not s or s == "WEBVTT" or _TS.match(s) or _CUE.match(s):
+        s = _TAG.sub("", line).strip()  # drop inline word-timing tags first
+        if not s or s == "WEBVTT" or _HEADER.match(s) or _TS.match(s) or _CUE.match(s):
             continue
         if lines and lines[-1] == s:  # ponytail: collapse adjacent dupes only
             continue
