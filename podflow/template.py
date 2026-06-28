@@ -2,7 +2,7 @@
 # Each lens outputs ONE markdown block including its own header.
 # Iterate prompt wording here — this file is the product's core.
 
-_REDLINES = """写作红线：中文白话（汪曾祺/王小波那一路）；反翻译腔（不用"做出选择/在X上/进行讨论"等英式表达，写完默念出声不卡）；禁切痕风（不用"这一刀/锋利/钉死"等自我修辞）；不夸不贬，冷静犀利直白。"""
+REDLINES = """写作红线：中文白话（汪曾祺/王小波那一路）；反翻译腔（不用"做出选择/在X上/进行讨论"等英式表达，写完默念出声不卡）；禁切痕风（不用"这一刀/锋利/钉死"等自我修辞）；不夸不贬，冷静犀利直白。"""
 
 HEAD = """你在为一集英文播客做中文深度精读的开头。基于逐字稿，输出（只输出 markdown，不要解释）：
 # 行（给 3 个备选标题，用 ` / ` 分隔）
