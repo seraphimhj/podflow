@@ -41,3 +41,10 @@ had restricted channels
     assert "align:start" not in out  # timing line stripped
     assert out.count("old media, you") == 1  # rolling dupe collapsed
     assert "had restricted channels" in out
+
+
+def test_clean_decodes_html_entities():
+    raw = "WEBVTT\n\n&gt;&gt; tom &amp; jerry\n"
+    out = clean_transcript(raw)
+    assert ">> tom & jerry" in out
+    assert "&gt;" not in out and "&amp;" not in out

@@ -1,3 +1,4 @@
+import html
 import os
 import re
 import tempfile
@@ -22,10 +23,11 @@ def _pick_audio(filenames: list[str]) -> str:
 
 def clean_transcript(raw: str) -> str:
     """Strip VTT/SRT timestamps, cue numbers, YouTube inline tags/headers,
-    blank runs, consecutive dupes."""
+    decode HTML entities, drop blank runs and consecutive dupes."""
     lines = []
     for line in raw.splitlines():
-        s = _TAG.sub("", line).strip()  # drop inline word-timing tags first
+        # drop inline timing tags, then decode entities (&gt;&gt; -> >>, &amp; -> &)
+        s = html.unescape(_TAG.sub("", line)).strip()
         if not s or s == "WEBVTT" or _HEADER.match(s) or _TS.match(s) or _CUE.match(s):
             continue
         if lines and lines[-1] == s:  # ponytail: collapse adjacent dupes only
