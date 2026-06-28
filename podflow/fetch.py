@@ -7,6 +7,17 @@ _TS = re.compile(r"\d{1,2}:\d{2}:\d{2}[.,]\d{3}\s*-->.*")
 _CUE = re.compile(r"^\d+$")
 
 
+def _pick_audio(filenames: list[str]) -> str:
+    """Pick the finished audio file from a temp dir listing.
+
+    Ignores partial/incomplete downloads; raises if none remain.
+    """
+    finished = [f for f in filenames if not f.endswith((".part", ".ytdl", ".tmp"))]
+    if not finished:
+        raise RuntimeError("no audio file was downloaded")
+    return sorted(finished)[0]
+
+
 def clean_transcript(raw: str) -> str:
     """Strip VTT/SRT timestamps, cue numbers, blank runs, consecutive dupes."""
     lines = []
@@ -87,7 +98,7 @@ def _transcribe(url: str) -> str:
         }
         with yt_dlp.YoutubeDL(opts) as ydl:
             ydl.download([url])
-        audio = os.path.join(d, os.listdir(d)[0])
+        audio = os.path.join(d, _pick_audio(os.listdir(d)))
         client = OpenAI(
             api_key=os.environ["SILICONFLOW_API_KEY"],
             base_url="https://api.siliconflow.cn/v1",
